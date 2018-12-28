@@ -1,0 +1,134 @@
+=======================================
+===== NORTH WIND DATA WAREHOUSING =====
+=======================================
+
+1. Indicadores
+
+-- Encontrados na net --
+
+    1. What were the total sales in dollars and by unit quantity for all the years and in a particular year, quarter or month?
+    2. What were the total sales in dollars and by unit quantity for all the categories of product, each category of product and every particular product in the given year?
+    3. What were the total sales in dollars and by unit quantity for all the categories of product, each category of product and every particular product for all the years, quarters and months?
+    4. What were the total sales in dollars for all the years, quarters and months by customer region?
+    5. What were the total sales in dollars made by a particular employee in all the years, in a particular year, quarter or month?
+    6. What was a particular suppliers share in the total sales in dollars in all the years, in a particular year, quarter or month?
+    7. What was a particular shippers share in the total sales in dollars in all the years, in a particular year, quarter or month?
+
+-Total sales amount per customer, year, and product category.
+-Three best-selling employees.
+-Best-selling employee per product and year.
+-Monthly orders/sales for each product category.
+-Total sales amount, number of products, and sum of the
+quantities sold for each order.
+
+
+2. Arquitetura
+
+Constelação de factos. 
+Dimensões	: Time, Customer, Product, Location, Employee, Supplier, Shipper
+Factos 		: Purchases, Orders 
+
+3. Dimension Atributos 
+
+3.1 Time 
+
+time_key, 
+data,
+ano,
+mes,
+semana,
+dia,
+dia da semana (String),
+dia da semana (Boolean),
+
+3.2 Dimension Customer 
+
+customer_key,
+customer_id, 
+company,
+first_name + last_name
+
+3.3 Dimension Product 
+
+product_key,
+product_id, 
+product_code,
+product_name,
+standard_cost, 
+list_price,
+discontinued,
+category
+
+3.4 Dimension Location -- COMO IMPLEMENTAR?
+
+location_key, 
+city,
+state,
+country
+
+INSERT INTO location (location_key,city,state,country)
+SELECT * 
+FROM 
+      (SELECT 'city_name', 'state_name', 'country_name') AS tmp
+WHERE NOT EXISTS 
+      (SELECT * FROM location WHERE city = 'city_name' AND state='state_name' AND country='country_name') 
+LIMIT 1;
+
+3.5 Dimension Employee 
+
+employee_key,
+employee_id, 
+company,
+first_name + last_name,
+
+3.6 Dimension Supplier 
+
+supplier_key,
+supplier_id, 
+company, 
+first_name + last_name,
+
+3.7 Dimension Shipper 
+
+shipper_key,
+shipper_id,  
+company,
+first_name + last_name,
+
+3.8 Facts Orders 
+
+order_key,
+order_id,
+order_date,
+shipped_date, 
+payed_date, 
+customer_key,
+employee_key,
+product_key,
+shipper_key,
+location_key, -- customer_location
+quantity,
+unit_price,
+discount,
+days_until_ship (?),
+total_price
+
+3.9 Facts Purchases 
+
+purchase_key,
+purchase_id,
+supplier_key,
+product_key,
+employee_key,
+quantity,
+unit_cost,
+expected_date,
+date_received,
+taxes
+
+
+
+
+
+
+
