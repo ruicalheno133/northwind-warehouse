@@ -136,29 +136,29 @@ END//
 
 
 -- ---------------------------------------------------
--- Atualiza tabela de auditoria PURCHASE_ORDERS_DETAILS_AUDIT
+-- Atualiza tabela de auditoria PURCHASE_ORDER_DETAILS_AUDIT
 -- quando um novo registo é inserido ou atualizado 
--- na tabela PURCHASE_ORDERS_DETAILS_ORDERS
+-- na tabela PURCHASE_ORDER_DETAILS_ORDERS
 -- ---------------------------------------------------
 
-CREATE TRIGGER audit_ins_purchase_orders_details
-AFTER INSERT ON northwind.purchase_orders_details
+CREATE TRIGGER audit_ins_purchase_order_details
+AFTER INSERT ON northwind.purchase_order_details
 FOR EACH ROW 
 BEGIN
-	CALL update_audit_purchase_orders_details(NEW.id, NEW.purchase_order_id, NEW.product_id, NEW.quantity, NEW.unit_cost, NEW.date_received);
+	CALL update_audit_purchase_order_details(NEW.id, NEW.purchase_order_id, NEW.product_id, NEW.quantity, NEW.unit_cost, NEW.date_received);
 END//
 
-CREATE TRIGGER audit_upd_purchase_orders_details
-AFTER UPDATE ON northwind.purchase_orders_details
+CREATE TRIGGER audit_upd_purchase_order_details
+AFTER UPDATE ON northwind.purchase_order_details
 FOR EACH ROW 
 BEGIN
-	CALL update_audit_purchase_orders_details(NEW.id, NEW.purchase_order_id, NEW.product_id, NEW.quantity, NEW.unit_cost, NEW.date_received);
+	CALL update_audit_purchase_order_details(NEW.id, NEW.purchase_order_id, NEW.product_id, NEW.quantity, NEW.unit_cost, NEW.date_received);
 END//
 
-CREATE PROCEDURE update_audit_purchase_orders_details (IN id INT, IN purchase_order_id INT, IN product_id INT, IN quantity DECIMAL(18,4), 
+CREATE PROCEDURE update_audit_purchase_order_details (IN id INT, IN purchase_order_id INT, IN product_id INT, IN quantity DECIMAL(18,4), 
 												   IN unit_cost DECIMAL(19,4), IN date_received DATETIME)
 BEGIN 
-	INSERT INTO northwind.purchase_orders_details_audit
+	INSERT INTO northwind.purchase_order_details_audit
 	VALUES (id, purchase_order_id, product_id, quantity, unit_cost, date_received);
 END//
 
@@ -173,7 +173,7 @@ CREATE TRIGGER audit_ins_purchase_orders
 AFTER INSERT ON northwind.purchase_orders
 FOR EACH ROW 
 BEGIN
-	CALL update_audit_purchase_orders(NEW.id, NEW.supplier_id, NEW.submitted_date NEW.expected_date, NEW.shipping_fee, NEW.taxes,
+	CALL update_audit_purchase_orders(NEW.id, NEW.supplier_id, NEW.submitted_date, NEW.expected_date, NEW.shipping_fee, NEW.taxes,
 										 NEW.payment_date, NEW.payment_amount, NEW.submitted_by);
 END//
 
@@ -181,7 +181,7 @@ CREATE TRIGGER audit_upd_purchase_orders
 AFTER UPDATE ON northwind.purchase_orders
 FOR EACH ROW 
 BEGIN
-	CALL update_audit_purchase_orders(NEW.id, NEW.supplier_id, NEW.submitted_date NEW.expected_date, NEW.shipping_fee, NEW.taxes,
+	CALL update_audit_purchase_orders(NEW.id, NEW.supplier_id, NEW.submitted_date, NEW.expected_date, NEW.shipping_fee, NEW.taxes,
 										 NEW.payment_date, NEW.payment_amount, NEW.submitted_by);
 END//
 
@@ -191,4 +191,67 @@ CREATE PROCEDURE update_audit_purchase_orders (IN id INT, IN supplier_id INT, IN
 BEGIN 
 	INSERT INTO northwind.purchase_orders_audit
 	VALUES (id, supplier_id, submitted_date, expected_date, shipping_fee, taxes, payment_date, payment_amount, submitted_date);
+END//
+
+
+-- ---------------------------------------------------
+-- Atualiza tabela de auditoria ORDERS_AUDIT
+-- quando um novo registo é inserido ou atualizado 
+-- na tabela ORDERS
+-- ---------------------------------------------------
+
+CREATE TRIGGER audit_ins_orders
+AFTER INSERT ON northwind.orders
+FOR EACH ROW 
+BEGIN
+	CALL update_audit_orders(NEW.id, NEW.employee_id, NEW.customer_id, NEW.order_date, NEW.shipped_date, NEW.shipper_id, 
+									 NEW.ship_address, NEW.ship_city, NEW.ship_state_province, NEW.ship_country_region, NEW.shipping_fee, 
+									 NEW.taxes, NEW.payment_type, NEW.paid_date);
+END//
+
+CREATE TRIGGER audit_upd_orders
+AFTER UPDATE ON northwind.orders
+FOR EACH ROW 
+BEGIN
+	CALL update_audit_orders(NEW.id, NEW.employee_id, NEW.customer_id, NEW.order_date, NEW.shipped_date, NEW.shipper_id, 
+									 NEW.ship_address, NEW.ship_city, NEW.ship_state_province, NEW.ship_country_region, NEW.shipping_fee, 
+									 NEW.taxes, NEW.payment_type, NEW.paid_date);
+END//
+
+CREATE PROCEDURE update_audit_orders (IN id INT, IN employee_id INT, IN customer_id INT, IN order_date DATETIME, IN shipped_date DATETIME, 
+											  IN shipper_id INT, IN ship_address LONGTEXT, IN ship_city VARCHAR(50), IN ship_state_province VARCHAR(50),
+											  IN ship_country_region VARCHAR(50), IN shipping_fee DECIMAL(19,4), IN taxes DECIMAL(19,4), IN payment_type VARCHAR(50), 
+											  IN paid_date DATETIME)
+BEGIN 
+	INSERT INTO northwind.orders_audit
+	VALUES (id, employee_id, customer_id, order_date, shipped_date, shipper_id, ship_address, ship_city, ship_state_province,
+			ship_country_region, shipping_fee, taxes, payment_type, paid_date);
+END//
+
+
+-- ---------------------------------------------------
+-- Atualiza tabela de auditoria ORDER_DETAILS_AUDIT
+-- quando um novo registo é inserido ou atualizado 
+-- na tabela ORDER_DETAILS
+-- -------------------------------------------------
+
+CREATE TRIGGER audit_ins_order_details
+AFTER INSERT ON northwind.order_details
+FOR EACH ROW 
+BEGIN
+	CALL update_audit_order_details(NEW.id, NEW.order_id, NEW.product_id, NEW.quantity, NEW.unit_price, NEW.discount);
+END//
+
+CREATE TRIGGER audit_upd_order_details
+AFTER UPDATE ON northwind.order_details
+FOR EACH ROW 
+BEGIN
+	CALL update_audit_order_details(NEW.id, NEW.order_id, NEW.product_id, NEW.quantity, NEW.unit_price, NEW.discount);
+END//
+
+CREATE PROCEDURE update_audit_order_details (IN id INT, IN order_id INT, IN product_id INT, IN quantity DECIMAL(18,4), IN unit_price DECIMAL(19,4), 
+											  IN discount DOUBLE)
+BEGIN 
+	INSERT INTO northwind.order_details_audit
+	VALUES (id, order_id, product_id, quantity, unit_price, discount);
 END//

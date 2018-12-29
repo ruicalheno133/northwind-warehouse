@@ -545,7 +545,7 @@ DEFAULT CHARACTER SET = utf8;
 -- -----------------------------------------------------
 
 -- -----------------------------------------------------
--- Audit Table `northwind`.`suppliers`
+-- Audit Table `northwind`.`suppliers_audit`
 -- -----------------------------------------------------
 
 CREATE TABLE IF NOT EXISTS `northwind`.`suppliers_audit` (
@@ -642,6 +642,7 @@ CREATE TABLE IF NOT EXISTS `northwind`.`employees_audit` (
   `last_name` VARCHAR(50) NULL DEFAULT NULL,
   `first_name` VARCHAR(50) NULL DEFAULT NULL
 )
+ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8;
 
 
@@ -673,7 +674,6 @@ CREATE TABLE IF NOT EXISTS `northwind`.`orders_audit` (
   `ship_address` LONGTEXT NULL DEFAULT NULL,
   `ship_city` VARCHAR(50) NULL DEFAULT NULL,
   `ship_state_province` VARCHAR(50) NULL DEFAULT NULL,
-  `ship_zip_postal_code` VARCHAR(50) NULL DEFAULT NULL,
   `ship_country_region` VARCHAR(50) NULL DEFAULT NULL,
   `shipping_fee` DECIMAL(19,4) NULL DEFAULT '0.0000',
   `taxes` DECIMAL(19,4) NULL DEFAULT '0.0000',
