@@ -671,7 +671,6 @@ CREATE TABLE IF NOT EXISTS `northwind`.`orders_audit` (
   `order_date` DATETIME NULL DEFAULT NULL,
   `shipped_date` DATETIME NULL DEFAULT NULL,
   `shipper_id` INT(11) NULL DEFAULT NULL,
-  `ship_address` LONGTEXT NULL DEFAULT NULL,
   `ship_city` VARCHAR(50) NULL DEFAULT NULL,
   `ship_state_province` VARCHAR(50) NULL DEFAULT NULL,
   `ship_country_region` VARCHAR(50) NULL DEFAULT NULL,

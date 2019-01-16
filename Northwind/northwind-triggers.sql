@@ -117,14 +117,14 @@ CREATE TRIGGER audit_ins_products
 AFTER INSERT ON northwind.products
 FOR EACH ROW 
 BEGIN
-	CALL update_audit_products(NEW.id, NEW.product_name, NEW.product_name, NEW.standard_cost, NEW.list_price, NEW.discontinued, NEW.category);
+	CALL update_audit_products(NEW.id, NEW.product_code, NEW.product_name, NEW.standard_cost, NEW.list_price, NEW.discontinued, NEW.category);
 END//
 
 CREATE TRIGGER audit_upd_products
 AFTER UPDATE ON northwind.products
 FOR EACH ROW 
 BEGIN
-	CALL update_audit_products(NEW.id, NEW.product_name, NEW.product_name, NEW.standard_cost, NEW.list_price, NEW.discontinued, NEW.category);
+	CALL update_audit_products(NEW.id, NEW.product_code, NEW.product_name, NEW.standard_cost, NEW.list_price, NEW.discontinued, NEW.category);
 END//
 
 CREATE PROCEDURE update_audit_products (IN id INT, IN code VARCHAR(25), IN name VARCHAR(50), IN standard_cost DECIMAL(19,4), 
@@ -190,7 +190,7 @@ CREATE PROCEDURE update_audit_purchase_orders (IN id INT, IN supplier_id INT, IN
 												   IN payment_amount DECIMAL(19,4), IN submitted_by INT)
 BEGIN 
 	INSERT INTO northwind.purchase_orders_audit
-	VALUES (id, supplier_id, submitted_date, expected_date, shipping_fee, taxes, payment_date, payment_amount, submitted_date);
+	VALUES (id, supplier_id, submitted_date, expected_date, shipping_fee, taxes, payment_date, payment_amount, submitted_by);
 END//
 
 
@@ -205,7 +205,7 @@ AFTER INSERT ON northwind.orders
 FOR EACH ROW 
 BEGIN
 	CALL update_audit_orders(NEW.id, NEW.employee_id, NEW.customer_id, NEW.order_date, NEW.shipped_date, NEW.shipper_id, 
-									 NEW.ship_address, NEW.ship_city, NEW.ship_state_province, NEW.ship_country_region, NEW.shipping_fee, 
+									 NEW.ship_city, NEW.ship_state_province, NEW.ship_country_region, NEW.shipping_fee, 
 									 NEW.taxes, NEW.payment_type, NEW.paid_date);
 END//
 
@@ -214,17 +214,17 @@ AFTER UPDATE ON northwind.orders
 FOR EACH ROW 
 BEGIN
 	CALL update_audit_orders(NEW.id, NEW.employee_id, NEW.customer_id, NEW.order_date, NEW.shipped_date, NEW.shipper_id, 
-									 NEW.ship_address, NEW.ship_city, NEW.ship_state_province, NEW.ship_country_region, NEW.shipping_fee, 
+									 NEW.ship_city, NEW.ship_state_province, NEW.ship_country_region, NEW.shipping_fee, 
 									 NEW.taxes, NEW.payment_type, NEW.paid_date);
 END//
 
 CREATE PROCEDURE update_audit_orders (IN id INT, IN employee_id INT, IN customer_id INT, IN order_date DATETIME, IN shipped_date DATETIME, 
-											  IN shipper_id INT, IN ship_address LONGTEXT, IN ship_city VARCHAR(50), IN ship_state_province VARCHAR(50),
+											  IN shipper_id INT, IN ship_city VARCHAR(50), IN ship_state_province VARCHAR(50),
 											  IN ship_country_region VARCHAR(50), IN shipping_fee DECIMAL(19,4), IN taxes DECIMAL(19,4), IN payment_type VARCHAR(50), 
 											  IN paid_date DATETIME)
 BEGIN 
 	INSERT INTO northwind.orders_audit
-	VALUES (id, employee_id, customer_id, order_date, shipped_date, shipper_id, ship_address, ship_city, ship_state_province,
+	VALUES (id, employee_id, customer_id, order_date, shipped_date, shipper_id, ship_city, ship_state_province,
 			ship_country_region, shipping_fee, taxes, payment_type, paid_date);
 END//
 
