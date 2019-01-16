@@ -5,7 +5,7 @@ begin
     declare customer int;
     declare company, `name` text;
     declare cursor1 cursor for
-		select distinct c.id, c.first_name || ' ' ||c.last_name AS `name`, c.company
+		select distinct c.id, concat(c.first_name,' ', c.last_name) AS `name`, c.company
         from customers_staging c;
     declare continue handler for not found set done=true;
     
@@ -13,7 +13,7 @@ begin
     
 		read_loop: loop
 		
-			fetch cursor1 into customer, company, `name`;
+			fetch cursor1 into customer, `name`, company;
             if done then leave read_loop;
             end if;
 			insert into DIM_CUSTOMER value 
@@ -31,7 +31,7 @@ begin
     declare employee int;
     declare company, `name` text;
     declare cursor1 cursor for
-		select distinct e.id, e.first_name || ' ' ||e.last_name AS `name`, e.company
+		select distinct e.id, concat(e.first_name,' ', e.last_name) AS `name`, e.company
         from employees_staging e;
     declare continue handler for not found set done=true;
     
@@ -39,7 +39,7 @@ begin
     
 		read_loop: loop
 		
-			fetch cursor1 into employee, company, `name`;
+			fetch cursor1 into employee, `name`, company;
             if done then leave read_loop;
             end if;
 			insert into DIM_EMPLOYEE value 
@@ -57,7 +57,7 @@ begin
     declare shipper int;
     declare company, `name` text;
     declare cursor1 cursor for
-		select distinct s.id, s.first_name || ' ' ||s.last_name AS `name`, s.company
+		select distinct s.id, ifnull(concat(s.first_name,' ', s.last_name),'N/A') AS `name`, s.company
         from shippers_staging s;
     declare continue handler for not found set done=true;
     
@@ -65,9 +65,10 @@ begin
     
 		read_loop: loop
 		
-			fetch cursor1 into shipper, company, `name`;
+			fetch cursor1 into shipper, `name`, company;
             if done then leave read_loop;
             end if;
+		
 			insert into DIM_SHIPPER value 
 				(null,shipper,company,`name`,now());
 				
@@ -83,7 +84,7 @@ begin
     declare supplier int;
     declare company, `name` text;
     declare cursor1 cursor for
-		select distinct s.id, s.first_name || ' ' ||s.last_name AS `name`, s.company
+		select distinct s.id, concat(s.first_name,' ', s.last_name) AS `name`, s.company
         from suppliers_staging s;
     declare continue handler for not found set done=true;
     
@@ -91,35 +92,10 @@ begin
     
 		read_loop: loop
 		
-			fetch cursor1 into supplier, company, `name`;
+			fetch cursor1 into supplier, `name`, company;
             if done then leave read_loop;
             end if;
-			insert into DIM_SUPPLIER value 
-				(null,supplier,company,`name`,now());
-				
-		end loop read_loop;
-
-    close cursor1;
-end //
-
-delimiter //
-create procedure migrar_suppliers()
-begin
-	declare done int default false;
-    declare supplier int;
-    declare company, `name` text;
-    declare cursor1 cursor for
-		select distinct s.id, s.first_name || ' ' ||s.last_name AS `name`, s.company
-        from suppliers_staging s;
-    declare continue handler for not found set done=true;
-    
-    open cursor1;
-    
-		read_loop: loop
-		
-			fetch cursor1 into supplier, company, `name`;
-            if done then leave read_loop;
-            end if;
+            
 			insert into DIM_SUPPLIER value 
 				(null,supplier,company,`name`,now());
 				
@@ -132,11 +108,11 @@ delimiter //
 create procedure migrar_products()
 begin
 	declare done int default false;
-    declare product, discontinued int;
-    declare standard_cost, list_price decimal(19,4);
-    declare prod_code, prod_name, category text;
+    declare product, disc int;
+    declare cost, price decimal;
+    declare prod_code, prod_name, cat text;
     declare cursor1 cursor for
-		select distinct id, product_code, product_name, standard_cost, list_price, category
+		select distinct id, product_code, product_name, standard_cost, list_price, discontinued, category
         from products_staging s;
     declare continue handler for not found set done=true;
     
@@ -144,11 +120,12 @@ begin
     
 		read_loop: loop
 		
-			fetch cursor1 into product, prod_code, prod_name, standard_cost, list_price, category;
+			fetch cursor1 into product, prod_code, prod_name, cost, price, disc, cat;
             if done then leave read_loop;
             end if;
+            
 			insert into DIM_PRODUCT value 
-				(null,product, prod_code, prod_name, standard_cost, list_price, category,now());
+				(null,product, product_code, prod_name, standard_cost, list_price, discontinued, category,now());
 				
 		end loop read_loop;
 
@@ -159,7 +136,7 @@ delimiter //
 create procedure migrar_locations()
 begin
 	declare done int default false;
-    declare address, city, state, country text;
+    declare city, state, country text;
     declare cursor1 cursor for
 		select distinct o.ship_city,o.ship_state_province, o.ship_country_region
         from orders_staging o;
