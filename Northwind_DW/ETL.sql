@@ -5,7 +5,7 @@ begin
     declare customer int;
     declare company, `name` text;
     declare cursor1 cursor for
-		select distinct c.id, concat(c.first_name,' ', c.last_name) AS `name`, c.company
+		select distinct c.id, ifnull(concat(c.first_name,' ', c.last_name),'N/A') AS `name`, ifnull(c.company,'N/A')
         from customers_staging c;
     declare continue handler for not found set done=true;
     
@@ -31,7 +31,7 @@ begin
     declare employee int;
     declare company, `name` text;
     declare cursor1 cursor for
-		select distinct e.id, concat(e.first_name,' ', e.last_name) AS `name`, e.company
+		select distinct e.id, ifnull(concat(e.first_name,' ', e.last_name),'N/A') AS `name`, ifnull(e.company,'N/A')
         from employees_staging e;
     declare continue handler for not found set done=true;
     
@@ -57,7 +57,7 @@ begin
     declare shipper int;
     declare company, `name` text;
     declare cursor1 cursor for
-		select distinct s.id, ifnull(concat(s.first_name,' ', s.last_name),'N/A') AS `name`, s.company
+		select distinct s.id, ifnull(concat(s.first_name,' ', s.last_name),'N/A') AS `name`, ifnull(s.company,'N/A')
         from shippers_staging s;
     declare continue handler for not found set done=true;
     
@@ -84,7 +84,7 @@ begin
     declare supplier int;
     declare company, `name` text;
     declare cursor1 cursor for
-		select distinct s.id, concat(s.first_name,' ', s.last_name) AS `name`, s.company
+		select distinct s.id, ifnull(concat(s.first_name,' ', s.last_name),'N/A') AS `name`, ifnull(s.company,'N/A')
         from suppliers_staging s;
     declare continue handler for not found set done=true;
     
@@ -112,7 +112,7 @@ begin
     declare cost, price decimal;
     declare prod_code, prod_name, cat text;
     declare cursor1 cursor for
-		select distinct id, product_code, product_name, standard_cost, list_price, discontinued, category
+		select distinct id, ifnull(product_code,'N/A') , ifnull(product_name,'N/A') , ifnull(standard_cost,-1), list_price, discontinued, ifnull(category,'N/A')
         from products_staging s;
     declare continue handler for not found set done=true;
     
