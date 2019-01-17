@@ -114,8 +114,8 @@ CREATE TABLE IF NOT EXISTS `northwind_dw`.`DIM_TIME` (
   `month` INT(11) NOT NULL,
   `week` INT(11) NOT NULL,
   `day` INT(11) NOT NULL,
-  `day_of_the_week` VARCHAR(3) NOT NULL,
-  `is_week_day` TINYINT(4) NOT NULL,
+  `day_of_the_week` VARCHAR(9) NOT NULL,
+  `is_week_day` TINYINT(1) NOT NULL,
   `created_date` DATETIME NOT NULL,
   PRIMARY KEY (`time_key`))
 ENGINE = InnoDB
@@ -142,6 +142,7 @@ CREATE TABLE IF NOT EXISTS `northwind_dw`.`FACT_ORDER` (
   `discount` DOUBLE NOT NULL,
   `total_price` DECIMAL(19,4) NOT NULL,
   `shipping_fee` DECIMAL(19,4) NOT NULL,
+  `taxes` DECIMAL(19,4) NOT NULL,
   PRIMARY KEY (`order_key`),
   INDEX `fk_FACT_ORDER_1_idx` (`order_date` ASC),
   INDEX `fk_FACT_ORDER_2_idx` (`shipped_date` ASC),
