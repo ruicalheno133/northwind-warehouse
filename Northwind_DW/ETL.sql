@@ -125,7 +125,7 @@ begin
             end if;
             
 			insert into DIM_PRODUCT value 
-				(null,product, product_code, prod_name, standard_cost, list_price, discontinued, category,now());
+				(null,product, prod_code, prod_name, cost, price, disc, cat,now());
 				
 		end loop read_loop;
 
@@ -138,7 +138,7 @@ begin
 	declare done int default false;
     declare city, state, country text;
     declare cursor1 cursor for
-		select distinct o.ship_city,o.ship_state_province, o.ship_country_region
+		select distinct ifnull(o.ship_city,'N/A'),ifnull(o.ship_state_province,'N/A'), ifnull(o.ship_country_region,'N/A')
         from orders_staging o;
     declare continue handler for not found set done=true;
     
@@ -225,7 +225,7 @@ begin
                         o.ship_city, o.ship_state_province, o.ship_country_region, ifnull(o.shipping_fee,'N/A'),
                         ifnull(o.taxes,'N/A'), ifnull(o.payment_type,'N/A'), o.paid_date
         from orders_staging o, order_details_staging od
-        where o.id=od.id and o.shipper_id is not null;
+        where o.id=od.order_id and o.shipper_id is not null;
     declare continue handler for not found set done=true;
     
     open cursor1;
