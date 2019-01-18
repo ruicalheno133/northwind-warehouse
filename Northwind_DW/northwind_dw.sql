@@ -215,6 +215,10 @@ CREATE TABLE IF NOT EXISTS `northwind_dw`.`FACT_PURCHASE` (
   `delivery_delay` INT(11) NOT NULL,
   `shipping_fee` DECIMAL(19,4) NOT NULL,
   `taxes` DECIMAL(19,4) NOT NULL,
+ 
+  `total_price` DECIMAL(19,4) NOT NULL,
+  
+  `delivery_days` INT(11) NOT NULL,
   PRIMARY KEY (`purchase_key`),
   INDEX `fk_FACT_PURCHASE_1_idx` (`supplier_key` ASC),
   INDEX `fk_FACT_PURCHASE_2_idx` (`employee_key` ASC),

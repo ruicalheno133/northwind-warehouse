@@ -50,6 +50,7 @@ begin
     close cursor1;
 end //
 
+
 delimiter //
 create procedure migrar_shipper()
 begin
@@ -76,6 +77,7 @@ begin
 
     close cursor1;
 end //
+
 
 delimiter //
 create procedure migrar_suppliers()
@@ -104,6 +106,7 @@ begin
     close cursor1;
 end //
 
+
 delimiter //
 create procedure migrar_products()
 begin
@@ -131,6 +134,7 @@ begin
 
     close cursor1;
 end //
+
 
 delimiter //
 create procedure migrar_locations()
@@ -175,7 +179,6 @@ BEGIN
 END;
 //
 
-
 DELIMITER //
 CREATE PROCEDURE migrar_time()
   BEGIN
@@ -210,6 +213,7 @@ CREATE PROCEDURE migrar_time()
       );
   END; //
 DELIMITER ;
+
 
 delimiter //
 create procedure migrar_facts_orders()
@@ -264,20 +268,21 @@ end //
 
 drop procedure migrar_facts_purchases;
 
+
 delimiter //
 create procedure migrar_facts_purchases()
 begin
 	declare done int default false;
-    declare purchase_id, product, submitted, supplier, delay int;
+    declare purchase_id, product, submitted, supplier, delay, days int;
     declare real_product, real_employee, real_supplier, real_received_date, real_payment_date, real_submitted_date, real_expected_date int;
     declare payment text;
     declare received_d, submitted_d, expected_d, payment_d date;
-    declare fee, cost, taxe, amount decimal(19,4);
+    declare fee, cost, taxe, amount, total decimal(19,4);
     declare quant decimal(18,4);
     declare cursor1 cursor for
 		select distinct pd.purchase_order_id, pd.product_id, pd.quantity, ifnull(pd.unit_cost,'N/A'), pd.date_received, 
 						p.supplier_id, p.submitted_date, p.expected_date, ifnull(p.shipping_fee,'N/A'),
-                        ifnull(p.taxes,'N/A'), p.payment_date, p.payment_amount, p.submitted_by
+                        ifnull(p.taxes,'N/A'), p.payment_date, p.payment_amount, p.submitted_by, datediff(pd.date_received,p.submitted_date)
         from purchase_orders_staging p, purchase_order_details_staging pd
         where p.id=pd.purchase_order_id;
     declare continue handler for not found set done=true;
@@ -287,7 +292,7 @@ begin
 		read_loop: loop
 		
 			fetch cursor1 into purchase_id, product, quant, cost, received_d, supplier, 
-							   submitted_d, expected_d, fee, taxe, payment_d, amount, submitted;
+							   submitted_d, expected_d, fee, taxe, payment_d, amount, submitted, days;
             if done then leave read_loop;
             end if;
             
@@ -299,11 +304,12 @@ begin
             set real_expected_date = (select time_key from DIM_TIME t where t.date=expected_d);
             set real_payment_date = (select time_key from DIM_TIME t where t.date=payment_d);
             set delay = (select real_received_date-real_expected_date from dual);
+            set total = (select quant * cost from dual);
             
             insert into FACT_PURCHASE value 
 				(null,purchase_id, real_supplier, real_employee, real_product, ifnull(real_expected_date,-1),
                 ifnull(real_received_date,-1), ifnull(real_submitted_date,-1),ifnull(real_payment_date,-1),
-                quant, cost, amount, ifnull(delay,-1), fee, taxe);
+                quant, cost, amount, ifnull(delay,-1), fee, taxe, total, ifnull(days,-1));
                 
 		end loop read_loop;
 
