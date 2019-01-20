@@ -316,3 +316,14 @@ begin
     close cursor1;
 end //
 
+delimiter ;
+
+CALL migrar_customer();
+CALL migrar_employee();
+CALL migrar_locations();
+CALL migrar_products();
+CALL migrar_shipper();
+CALL migrar_suppliers();
+CALL migrar_time();
+CALL migrar_facts_orders();
+CALL migrar_facts_purchases();
